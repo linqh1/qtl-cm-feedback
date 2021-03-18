@@ -18,11 +18,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class MessageListener implements MessageListenerConcurrently {
+public class MessageHandler implements MessageListenerConcurrently {
 
-    private static Logger logger = LoggerFactory.getLogger(MessageListener.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     @Value("${httpclient.timeout.connect:10000}")
     private int connTimeout;
@@ -48,6 +49,8 @@ public class MessageListener implements MessageListenerConcurrently {
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
         List<TaskMessage> messages = parseTaskMessage(msgs);
+        List<TaskMessage> prefetchMessage = messages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
+        List<TaskMessage> purgeMessage = messages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
         try {
             send(messages);
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
@@ -75,6 +78,7 @@ public class MessageListener implements MessageListenerConcurrently {
      * @param messages
      */
     private void send(List<TaskMessage> messages) {
+        //TODO send to NGAPI
     }
 
 }

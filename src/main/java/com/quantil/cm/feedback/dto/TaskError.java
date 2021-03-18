@@ -1,6 +1,6 @@
 package com.quantil.cm.feedback.dto;
 
-public class ErrorDTO {
+public class TaskError {
     private String errorCode;
 
     private String errorMessage;

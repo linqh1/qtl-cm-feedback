@@ -3,10 +3,11 @@ package com.quantil.cm.feedback.service;
 import com.alibaba.fastjson.JSONObject;
 import com.quantil.cm.feedback.constant.PurgeBeautifyProperties;
 import com.quantil.cm.feedback.domain.PurgeTaskLog;
-import com.quantil.cm.feedback.dto.ErrorDTO;
+import com.quantil.cm.feedback.dto.TaskError;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class PurgeBeautifyService {
 
+    private static Logger logger = LoggerFactory.getLogger(PurgeBeautifyService.class);
     @Autowired
     private PurgeBeautifyProperties beautifyProperties;
 
@@ -33,7 +35,7 @@ public class PurgeBeautifyService {
      */
     public int[] beautifyPurgeLog(List<PurgeTaskLog> errorLogs, int totalCnt) {
         if (!beautifyProperties.isEnable() || errorLogs.isEmpty() || totalCnt <= 0){
-            return null;
+            return new int[]{0,0};
         }
         int maxSkipErrorCodeCnt = beautifyProperties.getSkipThreshold().multiply(BigDecimal.valueOf(totalCnt)).setScale(0,BigDecimal.ROUND_UP).intValue();
         boolean reachSkipMaxRate = false;
@@ -46,7 +48,12 @@ public class PurgeBeautifyService {
             if (StringUtils.isBlank(log.getReason())) {
                 continue;
             }
-            List<ErrorDTO> errors = JSONObject.parseArray(log.getReason(), ErrorDTO.class);
+            List<TaskError> errors = null;
+            try {
+                errors = JSONObject.parseArray(log.getReason(), TaskError.class);
+            }catch (Exception e) {
+                logger.error("parse reason to json array failed",e);
+            }
             if (errors.size() != 1) {
                 continue;//这里我们只考虑每台机器只有一个error(AgentUnavailable, FeedbackTimeout)的错误
             }

@@ -1,35 +1,35 @@
 package com.quantil.cm.feedback.dto;
 
-import com.alibaba.fastjson.JSON;
-import com.quantil.cm.feedback.constant.Constants;
-import org.apache.rocketmq.common.message.MessageExt;
-
 public class TaskMessage {
 
-    private String id;
-    private int msgType;
+    private String taskId;
+    private String type;
     private int total;
     private int successCnt;
     private int failCnt;
 
-    private boolean isPrefetch() {
-        return this.msgType == Constants.MsgType.PREFETCH;
+    /**
+     * 是否是一个预取消息
+     * @return
+     */
+    public boolean isPrefetch() {
+        return this.type != null && this.type.equalsIgnoreCase("prefetch");
     }
 
-    public String getId() {
-        return id;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    public int getMsgType() {
-        return msgType;
+    public String getType() {
+        return type;
     }
 
-    public void setMsgType(int msgType) {
-        this.msgType = msgType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public int getTotal() {

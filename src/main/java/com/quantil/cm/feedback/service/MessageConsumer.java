@@ -16,7 +16,7 @@ import javax.annotation.PreDestroy;
 @Service
 public class MessageConsumer {
 
-    private static Logger logger = LoggerFactory.getLogger(MessageListener.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     private DefaultMQPushConsumer pushConsumer = null;
 
@@ -24,7 +24,7 @@ public class MessageConsumer {
     private RocketMQConsumerProperties consumerProperties;
 
     @Autowired
-    private MessageListener messageListener;
+    private MessageHandler messageHandler;
 
     @PostConstruct
     public void init() throws MQClientException, InterruptedException {
@@ -34,7 +34,7 @@ public class MessageConsumer {
         pushConsumer.subscribe(consumerProperties.getTopic(),"*");
         pushConsumer.setConsumeThreadMax(consumerProperties.getThreads());
         pushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        pushConsumer.registerMessageListener(messageListener);
+        pushConsumer.registerMessageListener(messageHandler);
         pushConsumer.start();
     }
     
