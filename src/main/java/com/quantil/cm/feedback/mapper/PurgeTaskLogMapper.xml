@@ -9,7 +9,7 @@
             AND type = 0
     </select>
 
-    <select id="selectMultiByTaskId" resultType="com.quantil.cm.feedback.domain.PurgeTaskLog">
+    <select id="selectByMultiTaskId" resultType="com.quantil.cm.feedback.domain.PurgeTaskLog">
         SELECT *
           FROM purge_task_log
     <where>
