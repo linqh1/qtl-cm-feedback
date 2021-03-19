@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import java.util.Date;
 
 @TableName("prefetch_task_log")
-public class PrefetchTaskLog {
+public class PrefetchTaskLog implements TaskLog {
 
     private String id;
 

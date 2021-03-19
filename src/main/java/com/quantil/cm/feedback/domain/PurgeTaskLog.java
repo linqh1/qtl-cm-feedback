@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import java.util.Date;
 
 @TableName("purge_task_log")
-public class PurgeTaskLog {
+public class PurgeTaskLog implements TaskLog {
 
     private String id;
 

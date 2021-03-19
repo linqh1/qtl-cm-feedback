@@ -34,7 +34,7 @@ public class BeautifyService {
      * @return
      */
     public int[] beautifyPurgeLog(List<PurgeTaskLog> errorLogs, int totalCnt) {
-        if (!beautifyProperties.isEnable() || errorLogs.isEmpty() || totalCnt <= 0){
+        if (!beautifyProperties.isEnable() || errorLogs == null || errorLogs.isEmpty() || totalCnt <= 0){
             return new int[]{0,0};
         }
         int maxSkipErrorCodeCnt = beautifyProperties.getSkipThreshold().multiply(BigDecimal.valueOf(totalCnt)).setScale(0,BigDecimal.ROUND_UP).intValue();
