@@ -15,6 +15,8 @@ public class RocketMQConsumerProperties {
 
     private int threads;
 
+    private int consumeMessageBatchSize;
+
     public String getGroup() {
         return group;
     }
@@ -45,5 +47,13 @@ public class RocketMQConsumerProperties {
 
     public void setThreads(int threads) {
         this.threads = threads;
+    }
+
+    public int getConsumeMessageBatchSize() {
+        return this.consumeMessageBatchSize;
+    }
+
+    public void setConsumeMessageBatchSize(int consumeMessageBatchSize) {
+        this.consumeMessageBatchSize = consumeMessageBatchSize;
     }
 }
