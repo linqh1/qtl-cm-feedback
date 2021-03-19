@@ -43,6 +43,8 @@ public class PurgeService {
                 PurgeFeedbackMessage feedbackMessage = new PurgeFeedbackMessage(message.getTaskId(),
                         message.getSuccessCnt() + res[0],message.getTotal() - res[1]);
                 feedbackMessage.setMessage(MessageUtil.logSummary(logs));
+                //TODO 查询 Vary File
+                feedbackMessage.setVariedFiles(null);
                 result.add(feedbackMessage);
             }
         }
