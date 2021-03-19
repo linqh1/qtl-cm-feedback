@@ -62,6 +62,7 @@ public class MessageHandler implements MessageListenerConcurrently {
 
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+        logger.info("consume {} message", msgs.size());
         List<HttpPut> requests = trans2Request(msgs);
         try {
             for (HttpPut request : requests) {
