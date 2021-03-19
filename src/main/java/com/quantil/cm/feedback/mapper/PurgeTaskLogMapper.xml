@@ -8,8 +8,8 @@
     <where>
         <if test="taskIds != null and taskIds.size() > 0">
           AND purge_task_id IN
-            <foreach collection="taskIds" open="(" close=")" separator="," item="taskIds">
-                #{purgeTaskId}
+            <foreach collection="taskIds" open="(" close=")" separator="," item="id">
+                #{id}
             </foreach>
         </if>
         <if test="taskIds == null or taskIds.size() &lt;= 0">
