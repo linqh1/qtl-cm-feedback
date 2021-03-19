@@ -6,8 +6,8 @@ public class PurgeFeedbackMessage extends PrefetchFeedbackMessage {
 
     private List<String> variedFiles;
 
-    public PurgeFeedbackMessage(String id) {
-        super(id);
+    public PurgeFeedbackMessage(String id,int success, int total) {
+        super(id,success,total);
     }
 
     public List<String> getVariedFiles() {

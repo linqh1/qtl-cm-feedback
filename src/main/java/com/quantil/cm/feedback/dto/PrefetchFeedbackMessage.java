@@ -1,5 +1,7 @@
 package com.quantil.cm.feedback.dto;
 
+import com.quantil.cm.feedback.util.MathUtil;
+
 import java.math.BigDecimal;
 
 public class PrefetchFeedbackMessage {
@@ -7,8 +9,9 @@ public class PrefetchFeedbackMessage {
     private BigDecimal successRate;
     private String message;
 
-    public PrefetchFeedbackMessage(String id) {
+    public PrefetchFeedbackMessage(String id,int success, int total) {
         this.id = id;
+        this.successRate = MathUtil.dividePercent(success,total);
     }
 
     public String getId() {

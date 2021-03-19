@@ -10,12 +10,12 @@ public class MathUtil {
      * @param totalCnt
      * @return
      */
-    public static double dividePercent(int cnt, int totalCnt) {
+    public static BigDecimal dividePercent(int cnt, int totalCnt) {
         double rate = 0.0;
         if (totalCnt != 0) {
             rate = (cnt * 100.0) / (totalCnt * 1.0);
         }
         BigDecimal doubleNum = BigDecimal.valueOf(rate);
-        return doubleNum.setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return doubleNum.setScale(1, BigDecimal.ROUND_HALF_UP);
     }
 }
