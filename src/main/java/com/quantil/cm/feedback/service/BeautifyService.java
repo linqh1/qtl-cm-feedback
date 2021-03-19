@@ -1,7 +1,7 @@
 package com.quantil.cm.feedback.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.quantil.cm.feedback.constant.PurgeBeautifyProperties;
+import com.quantil.cm.feedback.constant.BeautifyProperties;
 import com.quantil.cm.feedback.domain.PurgeTaskLog;
 import com.quantil.cm.feedback.dto.TaskError;
 import org.apache.commons.lang3.StringUtils;
@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
  * 针对 AgentUnavailable的errorCode, 不计入统计
  */
 @Service
-public class PurgeBeautifyService {
+public class BeautifyService {
 
-    private static Logger logger = LoggerFactory.getLogger(PurgeBeautifyService.class);
+    private static Logger logger = LoggerFactory.getLogger(BeautifyService.class);
     @Autowired
-    private PurgeBeautifyProperties beautifyProperties;
+    private BeautifyProperties beautifyProperties;
 
     /**
      * 美化错误日志,根据规则移除logs中的部分错误,然后返回一个二维数组.第一个表示视为成功的log数量,第二个表示不计入统计的数量

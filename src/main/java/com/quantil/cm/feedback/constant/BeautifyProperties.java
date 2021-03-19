@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Component
-@ConfigurationProperties(prefix = "purge.beautify")
-public class PurgeBeautifyProperties {
+@ConfigurationProperties(prefix = "cm.beautify")
+public class BeautifyProperties {
 
     /**
      * 是否开启美化
