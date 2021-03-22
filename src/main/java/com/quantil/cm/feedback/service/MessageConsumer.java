@@ -37,7 +37,7 @@ public class MessageConsumer {
         pushConsumer.subscribe(consumerProperties.getTopic(),"*");
         pushConsumer.setConsumeThreadMax(consumerProperties.getThreads());
         pushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        pushConsumer.setConsumeMessageBatchMaxSize(consumerProperties.getConsumeMessageBatchSize());
+        pushConsumer.setConsumeMessageBatchMaxSize(consumerProperties.getMessageBatchSize());
         pushConsumer.registerMessageListener(messageHandler);
         pushConsumer.start();
     }
