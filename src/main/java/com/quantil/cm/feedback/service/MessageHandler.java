@@ -84,7 +84,7 @@ public class MessageHandler implements MessageListenerConcurrently {
         List<TaskMessage> taskMessages = new ArrayList<>();
         for (MessageExt msg : msgs) {
             try {
-                logger.debug("consume msg: {}", new String(msg.getBody()));
+                logger.debug("msg: {}", new String(msg.getBody()));
                 taskMessages.add(JSON.parseObject(msg.getBody(),TaskMessage.class));
             }catch (Exception e){// 解析失败就不回推MQ了, 回推了重新拉还是解析失败
                 logger.error("parse MQ message:{} failed:{}",new String(msg.getBody()),e);
