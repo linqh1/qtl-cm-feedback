@@ -106,9 +106,16 @@ public class MessageHandler implements MessageListenerConcurrently {
         return result;
     }
 
+    /**
+     * 构建HTTP请求
+     * @param api
+     * @param entity
+     * @return
+     */
     private HttpPut buildHttpRequest(String api, HttpEntity entity) {
         HttpPut httpPut = new HttpPut(httpAddr + api);
         httpPut.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        //TODO NGAPI鉴权
         httpPut.setEntity(entity);
         return httpPut;
     }
