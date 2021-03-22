@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * purge 查询美化类
- * 针对 FeedbackTimeout的errorCode, 视为成功.
- * 针对 AgentUnavailable的errorCode, 不计入统计
+ * purge 查询美化类<br>
+ * 针对 FeedbackTimeout的errorCode, 视为成功.<br>
+ * 针对 AgentUnavailable的errorCode, 不计入统计<br>
  */
 @Service
 public class BeautifyService {
@@ -28,7 +28,8 @@ public class BeautifyService {
     private BeautifyProperties beautifyProperties;
 
     /**
-     * 美化错误日志,根据规则移除logs中的部分错误,然后返回一个二维数组.第一个表示视为成功的log数量,第二个表示不计入统计的数量
+     * 美化错误日志,根据规则移除logs中的部分错误,然后返回一个二维数组<br>
+     * 第一个表示视为成功的log数量,第二个表示不计入统计的数量<br>
      * @param errorLogs
      * @param totalCnt 总数
      * @return

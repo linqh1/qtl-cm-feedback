@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * RocketMQ 消息处理类
+ */
 @Service
 public class MessageHandler implements MessageListenerConcurrently {
 
