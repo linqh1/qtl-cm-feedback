@@ -34,7 +34,7 @@ public class AlertService {
 
     @PostConstruct
     public void init() throws UnknownHostException {
-        logger.info("alert config:", JSON.toJSONString(alertProperties));
+        logger.info("alert config:{}", JSON.toJSONString(alertProperties));
         if (alertProperties.getEndpoint() == null) {
             alertProperties.setEndpoint(InetAddress.getLocalHost().getHostName());
         }
