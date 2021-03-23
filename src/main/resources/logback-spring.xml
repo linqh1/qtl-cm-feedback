@@ -85,14 +85,15 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
-	
-	<springProfile name="dev">
-	  	<root>
-	  		<appender-ref ref="stdout" />
-		</root>
-    </springProfile>
+
+<!--	<springProfile name="dev">-->
+<!--	  	<root>-->
+<!--	  		<appender-ref ref="stdout" />-->
+<!--		</root>-->
+<!--    </springProfile>-->
 
 	<root level="info">
+		<appender-ref ref="stdout" />
 		<appender-ref ref="file-error" />
 		<appender-ref ref="file-warn" />
 		<appender-ref ref="file-info" />
