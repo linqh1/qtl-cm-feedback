@@ -19,7 +19,7 @@ import javax.annotation.PreDestroy;
 @Service
 public class MessageConsumer {
 
-    private static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageSender.class);
 
     private DefaultMQPushConsumer pushConsumer = null;
 
@@ -27,7 +27,7 @@ public class MessageConsumer {
     private MQConsumerProperties consumerProperties;
 
     @Autowired
-    private MessageHandler messageHandler;
+    private MessageSender messageSender;
 
     @PostConstruct
     public void init() throws MQClientException, InterruptedException {
@@ -38,7 +38,7 @@ public class MessageConsumer {
         pushConsumer.setConsumeThreadMax(consumerProperties.getThreads());
         pushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         pushConsumer.setConsumeMessageBatchMaxSize(consumerProperties.getMessageBatchSize());
-        pushConsumer.registerMessageListener(messageHandler);
+        pushConsumer.registerMessageListener(messageSender);
         pushConsumer.start();
     }
     

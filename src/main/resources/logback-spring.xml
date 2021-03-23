@@ -70,6 +70,21 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
+
+	<appender name="message" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<append>true</append>
+		<File>${LOG_HOME}/feedback_message.log</File>
+		<encoder>
+			<pattern>${logPattern}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/feedback_message.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
 	
 	<springProfile name="dev">
 	  	<root>
@@ -85,5 +100,9 @@
 
 	<logger name="org.springframework" level="WARN"/>
 	<logger name="org.apache" level="WARN"/>
+
+	<logger name="com.quantil.cm.feedback.service.MessageSender">
+		<appender-ref ref="message" />
+	</logger>
 
 </configuration>

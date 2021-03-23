@@ -20,7 +20,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -32,9 +31,9 @@ import java.util.stream.Collectors;
  * RocketMQ 消息处理类
  */
 @Service
-public class MessageHandler implements MessageListenerConcurrently {
+public class MessageSender implements MessageListenerConcurrently {
 
-    private static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageSender.class);
 
     @Autowired
     HttpClientProperties clientProperties;
@@ -97,13 +96,17 @@ public class MessageHandler implements MessageListenerConcurrently {
         List<TaskMessage> prefetchMessage = taskMessages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
         List<PrefetchFeedbackMessage> prefetchFeedbackList = prefetchService.getFeedbackMessage(prefetchMessage);
         if (!prefetchFeedbackList.isEmpty()) {
-            result.add(buildHttpRequest("/internal/prefetches",new StringEntity(JSON.toJSONString(prefetchFeedbackList),"UTF-8")));
+            String prefetchBody = JSON.toJSONString(prefetchFeedbackList);
+            logger.debug("prefetch feedback body:{}",prefetchBody);
+            result.add(buildHttpRequest("/internal/prefetches",new StringEntity(prefetchBody,"UTF-8")));
         }
 
         List<TaskMessage> purgeMessage = taskMessages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
         List<PurgeFeedbackMessage> purgeFeedbackList = purgeService.getFeedbackMessage(purgeMessage);
         if (!purgeFeedbackList.isEmpty()) {
-            result.add(buildHttpRequest("/internal/purges",new StringEntity(JSON.toJSONString(purgeFeedbackList),"UTF-8")));
+            String purgeBody = JSON.toJSONString(purgeFeedbackList);
+            logger.debug("purge feedback body:{}",purgeBody);
+            result.add(buildHttpRequest("/internal/purges",new StringEntity(purgeBody,"UTF-8")));
         }
         return result;
     }
