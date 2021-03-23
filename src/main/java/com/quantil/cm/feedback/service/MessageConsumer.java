@@ -1,7 +1,7 @@
 package com.quantil.cm.feedback.service;
 
 import com.alibaba.fastjson.JSON;
-import com.quantil.cm.feedback.properties.RocketMQConsumerProperties;
+import com.quantil.cm.feedback.properties.MQConsumerProperties;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
@@ -24,7 +24,7 @@ public class MessageConsumer {
     private DefaultMQPushConsumer pushConsumer = null;
 
     @Autowired
-    private RocketMQConsumerProperties consumerProperties;
+    private MQConsumerProperties consumerProperties;
 
     @Autowired
     private MessageHandler messageHandler;

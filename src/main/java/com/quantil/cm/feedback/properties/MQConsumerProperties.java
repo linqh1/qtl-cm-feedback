@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "rocketmq.consumer")
-public class RocketMQConsumerProperties {
+public class MQConsumerProperties {
 
     private String group;
 
