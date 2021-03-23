@@ -3,7 +3,10 @@ package com.quantil.cm.feedback.dto;
 public class TaskMessage {
 
     private String taskId;
-    private String type;
+    /**
+     * 0: purge 1:prefetch
+     */
+    private int msgType;
     private int total;
     private int successCnt;
     private int failCnt;
@@ -13,7 +16,7 @@ public class TaskMessage {
      * @return
      */
     public boolean isPrefetch() {
-        return this.type != null && this.type.equalsIgnoreCase("prefetch");
+        return this.msgType ==0;
     }
 
     public String getTaskId() {
@@ -22,14 +25,6 @@ public class TaskMessage {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public int getTotal() {
@@ -54,5 +49,13 @@ public class TaskMessage {
 
     public void setFailCnt(int failCnt) {
         this.failCnt = failCnt;
+    }
+
+    public int getMsgType() {
+        return msgType;
+    }
+
+    public void setMsgType(int msgType) {
+        this.msgType = msgType;
     }
 }
