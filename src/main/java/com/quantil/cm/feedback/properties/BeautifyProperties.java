@@ -1,4 +1,4 @@
-package com.quantil.cm.feedback.constant;
+package com.quantil.cm.feedback.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

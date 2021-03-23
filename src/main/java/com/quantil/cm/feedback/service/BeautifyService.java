@@ -1,7 +1,7 @@
 package com.quantil.cm.feedback.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.quantil.cm.feedback.constant.BeautifyProperties;
+import com.quantil.cm.feedback.properties.BeautifyProperties;
 import com.quantil.cm.feedback.domain.PurgeTaskLog;
 import com.quantil.cm.feedback.dto.TaskError;
 import org.apache.commons.lang3.StringUtils;
