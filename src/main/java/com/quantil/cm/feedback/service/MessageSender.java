@@ -3,15 +3,12 @@ package com.quantil.cm.feedback.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.util.IOUtils;
 import com.quantil.cm.feedback.dto.AlertData;
-import com.quantil.cm.feedback.dto.PrefetchFeedbackMessage;
-import com.quantil.cm.feedback.dto.PurgeFeedbackMessage;
-import com.quantil.cm.feedback.dto.TaskMessage;
+import com.quantil.cm.feedback.dto.PrefetchMessage;
+import com.quantil.cm.feedback.dto.PurgeMessage;
+import com.quantil.cm.feedback.dto.MQMessage;
 import com.quantil.cm.feedback.properties.HttpClientProperties;
-import javafx.scene.control.Alert;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
@@ -107,27 +104,27 @@ public class MessageSender implements MessageListenerConcurrently {
      * @return
      */
     private List<HttpPut> trans2Request(List<MessageExt> msgs) {
-        List<TaskMessage> taskMessages = new ArrayList<>();
+        List<MQMessage> MQMessages = new ArrayList<>();
         for (MessageExt msg : msgs) {
             try {
                 logger.debug("msg: {}", new String(msg.getBody()));
-                taskMessages.add(JSON.parseObject(msg.getBody(),TaskMessage.class));
+                MQMessages.add(JSON.parseObject(msg.getBody(), MQMessage.class));
             }catch (Exception e){// 解析失败就不回推MQ了, 回推了重新拉还是解析失败
                 logger.error("parse MQ message:{} failed:{}",new String(msg.getBody()),e);
             }
         }
         List<HttpPut> result = new ArrayList<>();
 
-        List<TaskMessage> prefetchMessage = taskMessages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
-        List<PrefetchFeedbackMessage> prefetchFeedbackList = prefetchService.getFeedbackMessage(prefetchMessage);
+        List<MQMessage> prefetchMessage = MQMessages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
+        List<PrefetchMessage> prefetchFeedbackList = prefetchService.getFeedbackMessage(prefetchMessage);
         if (!prefetchFeedbackList.isEmpty()) {
             String prefetchBody = JSON.toJSONString(prefetchFeedbackList);
             logger.debug("prefetch feedback body:{}",prefetchBody);
             result.add(buildHttpRequest("/internal/prefetches",new StringEntity(prefetchBody,"UTF-8")));
         }
 
-        List<TaskMessage> purgeMessage = taskMessages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
-        List<PurgeFeedbackMessage> purgeFeedbackList = purgeService.getFeedbackMessage(purgeMessage);
+        List<MQMessage> purgeMessage = MQMessages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
+        List<PurgeMessage> purgeFeedbackList = purgeService.getFeedbackMessage(purgeMessage);
         if (!purgeFeedbackList.isEmpty()) {
             String purgeBody = JSON.toJSONString(purgeFeedbackList);
             logger.debug("purge feedback body:{}",purgeBody);

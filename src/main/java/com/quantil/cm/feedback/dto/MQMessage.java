@@ -1,6 +1,6 @@
 package com.quantil.cm.feedback.dto;
 
-public class TaskMessage {
+public class MQMessage {
 
     private String taskId;
     /**

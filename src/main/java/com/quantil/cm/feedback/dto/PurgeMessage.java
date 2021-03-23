@@ -2,11 +2,11 @@ package com.quantil.cm.feedback.dto;
 
 import java.util.List;
 
-public class PurgeFeedbackMessage extends PrefetchFeedbackMessage {
+public class PurgeMessage extends PrefetchMessage {
 
     private List<String> variedFiles;
 
-    public PurgeFeedbackMessage(String id,int success, int total) {
+    public PurgeMessage(String id, int success, int total) {
         super(id,success,total);
     }
 

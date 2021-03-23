@@ -4,12 +4,12 @@ import com.quantil.cm.feedback.util.MathUtil;
 
 import java.math.BigDecimal;
 
-public class PrefetchFeedbackMessage {
+public class PrefetchMessage {
     private String id;
     private BigDecimal successRate;
     private String message;
 
-    public PrefetchFeedbackMessage(String id,int success, int total) {
+    public PrefetchMessage(String id, int success, int total) {
         this.id = id;
         this.successRate = MathUtil.dividePercent(success,total);
     }
