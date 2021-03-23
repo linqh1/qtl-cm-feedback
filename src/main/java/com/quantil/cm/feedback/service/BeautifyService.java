@@ -1,5 +1,6 @@
 package com.quantil.cm.feedback.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.quantil.cm.feedback.properties.BeautifyProperties;
 import com.quantil.cm.feedback.domain.PurgeTaskLog;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,11 @@ public class BeautifyService {
     private static Logger logger = LoggerFactory.getLogger(BeautifyService.class);
     @Autowired
     private BeautifyProperties beautifyProperties;
+
+    @PostConstruct
+    public void init() {
+        logger.info("beautify config:{}", JSON.toJSONString(beautifyProperties));
+    }
 
     /**
      * 美化错误日志,根据规则移除logs中的部分错误,然后返回一个二维数组<br>

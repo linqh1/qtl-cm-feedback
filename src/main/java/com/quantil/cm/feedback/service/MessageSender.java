@@ -1,18 +1,25 @@
 package com.quantil.cm.feedback.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.util.IOUtils;
+import com.quantil.cm.feedback.dto.AlertData;
 import com.quantil.cm.feedback.dto.PrefetchFeedbackMessage;
 import com.quantil.cm.feedback.dto.PurgeFeedbackMessage;
 import com.quantil.cm.feedback.dto.TaskMessage;
 import com.quantil.cm.feedback.properties.HttpClientProperties;
+import javafx.scene.control.Alert;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
@@ -42,12 +49,15 @@ public class MessageSender implements MessageListenerConcurrently {
     private PurgeService purgeService;
     @Autowired
     private PrefetchService prefetchService;
+    @Autowired
+    private AlertService alertService;
 
-    private HttpClient httpClient = null;
+    private CloseableHttpClient httpClient = null;
     private PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
 
     @PostConstruct
     public void init() {
+        logger.info("httpclient config:{}",JSON.toJSONString(clientProperties));
         httpClient = HttpClients.custom()
                 .useSystemProperties()
                 .setDefaultRequestConfig(RequestConfig.custom()
@@ -65,13 +75,28 @@ public class MessageSender implements MessageListenerConcurrently {
         if (clientProperties.isDebug()) {
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         }
+        List<CloseableHttpResponse> responseList = new ArrayList<>();
         try {
             for (HttpPut request : requests) {
-                httpClient.execute(request);
+                CloseableHttpResponse response = httpClient.execute(request);
+                responseList.add(response);
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode/100 != 2) {
+                    logger.error("feedback return non-2xx status code:{}. body: {}", statusCode,
+                            EntityUtils.toString(response.getEntity()));
+                    alertService.alert(new AlertData("CM-Callback-Failed"));
+                    return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                }
             }
         }catch (Exception e) {
             logger.error("execute http request failed", e);
+            alertService.alert(new AlertData("CM-Callback-Failed"));
             return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+        }finally {
+            responseList.forEach(resp -> {
+                EntityUtils.consumeQuietly(resp.getEntity());
+                IOUtils.close(resp);
+            });
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     }
