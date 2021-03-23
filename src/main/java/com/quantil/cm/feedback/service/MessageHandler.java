@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.quantil.cm.feedback.dto.PrefetchFeedbackMessage;
 import com.quantil.cm.feedback.dto.PurgeFeedbackMessage;
 import com.quantil.cm.feedback.dto.TaskMessage;
+import com.quantil.cm.feedback.properties.HttpClientProperties;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.HttpClient;
@@ -35,13 +36,8 @@ public class MessageHandler implements MessageListenerConcurrently {
 
     private static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
-    @Value("${cm.feedback.timeout.connect:10000}")
-    private int connTimeout;
-    @Value("${cm.feedback.timeout.socket:20000}")
-    private int socketTimeout;
-
-    @Value("cm.feedback.addr")
-    private String httpAddr;
+    @Autowired
+    HttpClientProperties clientProperties;
 
     @Autowired
     private PurgeService purgeService;
@@ -56,8 +52,8 @@ public class MessageHandler implements MessageListenerConcurrently {
         httpClient = HttpClients.custom()
                 .useSystemProperties()
                 .setDefaultRequestConfig(RequestConfig.custom()
-                        .setConnectTimeout(connTimeout)
-                        .setSocketTimeout(socketTimeout)
+                        .setConnectTimeout(clientProperties.getConnectTimeout())
+                        .setSocketTimeout(clientProperties.getSocketTimeout())
                         .build())
                 .setConnectionManager(connectionManager)
                 .build();
@@ -67,6 +63,9 @@ public class MessageHandler implements MessageListenerConcurrently {
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
         logger.info("consume {} message", msgs.size());
         List<HttpPut> requests = trans2Request(msgs);
+        if (clientProperties.isDebug()) {
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+        }
         try {
             for (HttpPut request : requests) {
                 httpClient.execute(request);
@@ -116,7 +115,7 @@ public class MessageHandler implements MessageListenerConcurrently {
      * @return
      */
     private HttpPut buildHttpRequest(String api, HttpEntity entity) {
-        HttpPut httpPut = new HttpPut(httpAddr + api);
+        HttpPut httpPut = new HttpPut(clientProperties.getAddress() + api);
         httpPut.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         //TODO NGAPI鉴权
         httpPut.setEntity(entity);
