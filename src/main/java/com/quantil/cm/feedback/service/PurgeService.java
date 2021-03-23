@@ -1,9 +1,11 @@
 package com.quantil.cm.feedback.service;
 
 import com.quantil.cm.feedback.domain.PurgeTaskLog;
+import com.quantil.cm.feedback.domain.PurgeVaryUrl;
 import com.quantil.cm.feedback.dto.PurgeFeedbackMessage;
 import com.quantil.cm.feedback.dto.TaskMessage;
 import com.quantil.cm.feedback.mapper.PurgeTaskLogMapper;
+import com.quantil.cm.feedback.mapper.PurgeVaryUrlMapper;
 import com.quantil.cm.feedback.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,11 @@ import java.util.stream.Collectors;
 public class PurgeService {
 
     @Autowired
-    private BeautifyService beautifyService;
+    BeautifyService beautifyService;
     @Autowired
-    private PurgeTaskLogMapper purgeTaskLogMapper;
+    PurgeTaskLogMapper purgeTaskLogMapper;
+    @Autowired
+    PurgeVaryUrlMapper purgeVaryUrlMapper;
 
     /**
      * 获取purge反馈消息
@@ -43,9 +47,18 @@ public class PurgeService {
                 PurgeFeedbackMessage feedbackMessage = new PurgeFeedbackMessage(message.getTaskId(),
                         message.getSuccessCnt() + res[0],message.getTotal() - res[1]);
                 feedbackMessage.setMessage(MessageUtil.logSummary(logs));
-                //TODO 查询 Vary File
                 feedbackMessage.setVariedFiles(null);
                 result.add(feedbackMessage);
+            }
+        }
+        // 设置Vary File
+        List<String> purgeIdList = purgeMessage.stream().map(m -> m.getTaskId()).collect(Collectors.toList());
+        List<PurgeVaryUrl> purgeVaryUrlList = purgeVaryUrlMapper.selectByTaskId(purgeIdList);
+        Map<String, List<PurgeVaryUrl>> varyUrlMap = purgeVaryUrlList.stream().collect(Collectors.groupingBy(PurgeVaryUrl::getTaskId));
+        for (PurgeFeedbackMessage feedbackMessage : result) {
+            List<PurgeVaryUrl> urlList = varyUrlMap.get(feedbackMessage.getId());
+            if (urlList != null) {
+                feedbackMessage.setVariedFiles(urlList.stream().map(url -> url.getUrl()).distinct().collect(Collectors.toList()));
             }
         }
         return result;
