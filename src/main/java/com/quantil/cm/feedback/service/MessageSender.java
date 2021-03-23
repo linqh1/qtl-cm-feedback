@@ -104,18 +104,18 @@ public class MessageSender implements MessageListenerConcurrently {
      * @return
      */
     private List<HttpPut> trans2Request(List<MessageExt> msgs) {
-        List<MQMessage> MQMessages = new ArrayList<>();
+        List<MQMessage> mqMessages = new ArrayList<>();
         for (MessageExt msg : msgs) {
             try {
-                logger.debug("msg: {}", new String(msg.getBody()));
-                MQMessages.add(JSON.parseObject(msg.getBody(), MQMessage.class));
+                mqMessages.add(JSON.parseObject(msg.getBody(), MQMessage.class));
             }catch (Exception e){// 解析失败就不回推MQ了, 回推了重新拉还是解析失败
                 logger.error("parse MQ message:{} failed:{}",new String(msg.getBody()),e);
             }
         }
+        logger.debug("consumer message:{}",JSON.toJSONString(mqMessages));
         List<HttpPut> result = new ArrayList<>();
 
-        List<MQMessage> prefetchMessage = MQMessages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
+        List<MQMessage> prefetchMessage = mqMessages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
         List<PrefetchMessage> prefetchFeedbackList = prefetchService.getFeedbackMessage(prefetchMessage);
         if (!prefetchFeedbackList.isEmpty()) {
             String prefetchBody = JSON.toJSONString(prefetchFeedbackList);
@@ -123,7 +123,7 @@ public class MessageSender implements MessageListenerConcurrently {
             result.add(buildHttpRequest("/internal/prefetches",new StringEntity(prefetchBody,"UTF-8")));
         }
 
-        List<MQMessage> purgeMessage = MQMessages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
+        List<MQMessage> purgeMessage = mqMessages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
         List<PurgeMessage> purgeFeedbackList = purgeService.getFeedbackMessage(purgeMessage);
         if (!purgeFeedbackList.isEmpty()) {
             String purgeBody = JSON.toJSONString(purgeFeedbackList);
