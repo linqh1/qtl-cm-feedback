@@ -15,6 +15,8 @@ public class AlertProperties {
 
     private String endpoint;
 
+    private String metric;
+
     public int getConnectTimeout() {
         return connectTimeout;
     }
@@ -45,5 +47,13 @@ public class AlertProperties {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public String getMetric() {
+        return metric;
+    }
+
+    public void setMetric(String metric) {
+        this.metric = metric;
     }
 }
