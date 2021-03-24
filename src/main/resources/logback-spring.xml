@@ -17,23 +17,6 @@
 			<pattern>${logPattern}</pattern>
 		</encoder>
 	</appender>
-	<appender name="file-info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>${LOG_HOME}/feedback_info.log</File>
-		<append>true</append>
-		<encoder>
-			<pattern>${logPattern}</pattern>
-		</encoder>
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>INFO</level>
-		</filter>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/feedback_info.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
-			<maxHistory>7</maxHistory>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-	</appender>
 
 	<appender name="file-error" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<append>true</append>
@@ -96,7 +79,6 @@
 		<appender-ref ref="stdout" />
 		<appender-ref ref="file-error" />
 		<appender-ref ref="file-warn" />
-		<appender-ref ref="file-info" />
 	</root>
 
 	<logger name="org.springframework" level="WARN"/>
@@ -105,5 +87,9 @@
 	<logger name="com.quantil.cm.feedback.service.MessageSender">
 		<appender-ref ref="message" />
 	</logger>
+
+	<logger name="RocketmqCommon" level="WARN"/>
+	<logger name="RocketmqClient" level="WARN"/>
+	<logger name="RocketmqRemoting" level="WARN"/>
 
 </configuration>
