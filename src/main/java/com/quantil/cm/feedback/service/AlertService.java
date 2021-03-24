@@ -40,11 +40,13 @@ public class AlertService {
         }
     }
 
-    public void alert(AlertData data) {
+    public void alert(String tags) {
+        AlertData data = new AlertData(alertProperties.getMetric());
+        data.setTags(tags);
         alert(Arrays.asList(data));
     }
 
-    public void alert(List<AlertData> data) {
+    private void alert(List<AlertData> data) {
         for (AlertData d : data) {
             if (StringUtils.isBlank(d.getEndpoint())) {
                 d.setEndpoint(alertProperties.getEndpoint());

@@ -81,13 +81,13 @@ public class MessageSender implements MessageListenerConcurrently {
                 if (statusCode/100 != 2) {
                     logger.error("feedback return non-2xx status code:{}. body: {}", statusCode,
                             EntityUtils.toString(response.getEntity()));
-                    alertService.alert(new AlertData("CM-Callback-Failed"));
+                    alertService.alert("Param=SendFailed");
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
             }
         }catch (Exception e) {
             logger.error("execute http request failed", e);
-            alertService.alert(new AlertData("CM-Callback-Failed"));
+            alertService.alert("Param=SendFailed");
             return ConsumeConcurrentlyStatus.RECONSUME_LATER;
         }finally {
             responseList.forEach(resp -> {
