@@ -1,5 +1,5 @@
 #!/bin/bash
-# */1 * * * * root /usr/local/qtl-cm-feedback/mon.sh > /dev/null 2>&1
+# */1 * * * * root /usr/local/qtl-cm-feedback/alive_mon.sh > /dev/null 2>&1
 processCnt=$(ps -ef | grep java | grep qtl-cm-feedback | wc -l)
 metric=cm-feedback-error
 tags=DataType=alarmData,Param=AliveError

@@ -42,7 +42,7 @@ public class AlertService {
 
     public void alert(String tags) {
         AlertData data = new AlertData(alertProperties.getMetric());
-        data.setTags(tags);
+        data.setTags("DataType=alarmData," + tags);
         alert(Arrays.asList(data));
     }
 
