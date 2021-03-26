@@ -7,20 +7,39 @@ cntThreshold=$3
 echo "######## Message Delay Monitor ($consumerGroup) ########"
 echo "######## Alert Threshold: DelayTime>=$timeThreshold Or DelayCnt>=$cntThreshold ########"
 
-progressDetail=$(./mqadmin consumerProgress -n 127.0.0.1:9876 -g "$consumerGroup")
-echo "$progressDetail"
+mqoutput=$(./mqadmin consumerProgress -n 127.0.0.1:9876 -g "$consumerGroup" 2>&1)
+echo "$mqoutput"
 
-delayCnt=$(echo "$progressDetail" | grep "Diff Total" | tail -n 1 | sed 's/Diff Total: //g')
+delayCnt=$(echo "$mqoutput" | grep "Diff Total" | tail -n 1 | sed 's/Diff Total: //g')
 delaySec=0
 
-progressDetail=$(echo "$progressDetail" | sed -n '/#Topic/,/^$/p' | tail -n +2)
+progressDetail=$(echo "$mqoutput" | sed -n '/#Topic/,/^$/p' | tail -n +2)
+now=$(date +%s)
+function alert()
+{
+  echo "Alert! $1"
+  alertTags="DataType=alarmData,threshold=${timeThreshold}s-$cntThreshold,Param=$1"
+  #echo "$alertTags, $delaySec, $delayCnt, $now, $consumerGroup"
+  alertCnt=$delayCnt
+  if [ "$alertCnt" =  "" ];then
+    alertCnt=0
+  fi
+  curl -X POST -H "Content-Type:application/json; charset=utf-8" -d \
+      "[{\"Metric\":\"CM-MQ-Message-Accumulate\", \
+         \"Tags\":\"$alertTags\", \
+         \"Value\":{\"time\":$delaySec,\"cnt\":$alertCnt}, \
+         \"Timestamp\":$now, \
+         \"Endpoint\":\"$consumerGroup\", \
+         \"CounterType\":\"GAUGE\", \
+         \"Step\":60}]" http://127.0.0.1:2121/v1/push
+}
 
 if [ "$progressDetail" = "" ];then
-    echo "error mq output"
-    exit 1
+  echo "$(date) $mqoutput" >> ~/mqmsg_mon.log
+  alert "AbnormalOutput"
+  exit 1
 fi
 
-now=$(date +%s)
 while read -r line
 do
   consumerDate=$(echo "$line" | awk '{print $8,$9}' | awk 'gsub(/^ *| *$/,"")' )
@@ -31,21 +50,13 @@ do
     if (( diff > timeThreshold )) && (( diff > delaySec ));then
       delaySec=$diff
     fi
+  else
+    alert "BrokerDelay"
   fi
 done< <(echo "$progressDetail" | awk '{ if ($7 > 0) print}')
 
 echo "delay message cnt:$delayCnt, delay time=$delaySec s"
 
-metric=CM-MQ-Message-Accumulate
 if [[ $delaySec > $timeThreshold ]] || [[ $delayCnt > $cntThreshold ]];then
-  echo "Alert !!!!"
-  tags="DataType=alarmData,threshold=${timeThreshold}s-$cntThreshold"
-  curl -X POST -H "Content-Type:application/json; charset=utf-8" -d \
-    "[{\"Metric\":\"$metric\", \
-       \"Tags\":\"$tags\", \
-       \"Value\":{\"time\":$delaySec,\"cnt\":$delayCnt}, \
-       \"Timestamp\":$now, \
-       \"Endpoint\":\"$consumerGroup\", \
-       \"CounterType\":\"GAUGE\", \
-       \"Step\":60}]" http://127.0.0.1:2121/v1/push
+  alert "MessageDelay"
 fi
