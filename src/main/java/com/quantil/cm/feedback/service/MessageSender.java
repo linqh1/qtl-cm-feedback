@@ -107,7 +107,7 @@ public class MessageSender implements MessageListenerConcurrently {
         List<MQMessage> mqMessages = new ArrayList<>();
         for (MessageExt msg : msgs) {
             try {
-                mqMessages.add(JSON.parseObject(msg.getBody(), MQMessage.class));
+                mqMessages.addAll(JSON.parseArray(new String(msg.getBody()), MQMessage.class));
             }catch (Exception e){// 解析失败就不回推MQ了, 回推了重新拉还是解析失败
                 logger.error("parse MQ message:{} failed:{}",new String(msg.getBody()),e);
             }
