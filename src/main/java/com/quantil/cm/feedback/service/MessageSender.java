@@ -117,19 +117,23 @@ public class MessageSender implements MessageListenerConcurrently {
         List<HttpPut> result = new ArrayList<>();
 
         List<MQMessage> prefetchMessage = mqMessages.stream().filter(m -> m.isPrefetch()).collect(Collectors.toList());
-        List<PrefetchMessage> prefetchFeedbackList = prefetchService.getFeedbackMessage(prefetchMessage);
-        if (!prefetchFeedbackList.isEmpty()) {
-            String prefetchBody = JSON.toJSONString(prefetchFeedbackList);
-            logger.debug("prefetch feedback body:{}",prefetchBody);
-            result.add(buildHttpRequest("/internal/prefetches",new StringEntity(prefetchBody,"UTF-8")));
+        if (!prefetchMessage.isEmpty()) {
+            List<PrefetchMessage> prefetchFeedbackList = prefetchService.getFeedbackMessage(prefetchMessage);
+            if (!prefetchFeedbackList.isEmpty()) {
+                String prefetchBody = JSON.toJSONString(prefetchFeedbackList);
+                logger.debug("prefetch feedback body:{}",prefetchBody);
+                result.add(buildHttpRequest("/internal/prefetches",new StringEntity(prefetchBody,"UTF-8")));
+            }
         }
 
         List<MQMessage> purgeMessage = mqMessages.stream().filter(m -> !m.isPrefetch()).collect(Collectors.toList());
-        List<PurgeMessage> purgeFeedbackList = purgeService.getFeedbackMessage(purgeMessage);
-        if (!purgeFeedbackList.isEmpty()) {
-            String purgeBody = JSON.toJSONString(purgeFeedbackList);
-            logger.debug("purge feedback body:{}",purgeBody);
-            result.add(buildHttpRequest("/internal/purges",new StringEntity(purgeBody,"UTF-8")));
+        if (!purgeMessage.isEmpty()) {
+            List<PurgeMessage> purgeFeedbackList = purgeService.getFeedbackMessage(purgeMessage);
+            if (!purgeFeedbackList.isEmpty()) {
+                String purgeBody = JSON.toJSONString(purgeFeedbackList);
+                logger.debug("purge feedback body:{}",purgeBody);
+                result.add(buildHttpRequest("/internal/purges",new StringEntity(purgeBody,"UTF-8")));
+            }
         }
         return result;
     }
