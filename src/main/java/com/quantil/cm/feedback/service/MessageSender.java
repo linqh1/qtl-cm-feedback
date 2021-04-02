@@ -110,7 +110,7 @@ public class MessageSender implements MessageListenerConcurrently {
                 mqMessages.addAll(JSON.parseArray(new String(msg.getBody()), MQMessage.class));
             }catch (Exception e){// 解析失败就不回推MQ了, 回推了重新拉还是解析失败
                 logger.error("parse MQ message:{} failed:{}",new String(msg.getBody()),e);
-                alertService.alert("UnrecognizedMessage");
+                alertService.alert("Param=UnrecognizedMessage");
             }
         }
         logger.debug("consumer message:{}",JSON.toJSONString(mqMessages));
