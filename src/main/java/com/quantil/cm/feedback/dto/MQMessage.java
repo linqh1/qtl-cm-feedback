@@ -16,7 +16,7 @@ public class MQMessage {
      * @return
      */
     public boolean isPrefetch() {
-        return this.msgType ==0;
+        return this.msgType == 1;
     }
 
     public String getTaskId() {
