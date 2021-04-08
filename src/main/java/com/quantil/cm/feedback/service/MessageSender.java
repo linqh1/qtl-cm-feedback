@@ -2,11 +2,11 @@ package com.quantil.cm.feedback.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.util.IOUtils;
-import com.quantil.cm.feedback.dto.AlertData;
+import com.quantil.cm.feedback.dto.MQMessage;
 import com.quantil.cm.feedback.dto.PrefetchMessage;
 import com.quantil.cm.feedback.dto.PurgeMessage;
-import com.quantil.cm.feedback.dto.MQMessage;
 import com.quantil.cm.feedback.properties.HttpClientProperties;
+import com.quantil.cm.feedback.util.EncryptUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.config.RequestConfig;
@@ -24,11 +24,13 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -41,13 +43,16 @@ public class MessageSender implements MessageListenerConcurrently {
 
     @Autowired
     HttpClientProperties clientProperties;
-
     @Autowired
     private PurgeService purgeService;
     @Autowired
     private PrefetchService prefetchService;
     @Autowired
     private AlertService alertService;
+    @Value("${ngapi.user}")
+    private String ngapiUser;
+    @Value("${ngapi.password}")
+    private String ngapiPassword;
 
     private CloseableHttpClient httpClient = null;
     private PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
@@ -147,8 +152,9 @@ public class MessageSender implements MessageListenerConcurrently {
     private HttpPut buildHttpRequest(String api, HttpEntity entity) {
         HttpPut httpPut = new HttpPut(clientProperties.getAddress() + api);
         httpPut.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        //TODO NGAPI鉴权
         httpPut.setEntity(entity);
+        Map<String, String> authHeader = EncryptUtil.quantilAuthHeader(ngapiUser, ngapiPassword);
+        authHeader.forEach((k,v) -> httpPut.setHeader(k,v));
         return httpPut;
     }
 }
