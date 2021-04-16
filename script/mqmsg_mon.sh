@@ -57,6 +57,6 @@ done< <(echo "$progressDetail" | awk '{ if ($7 > 0) print}')
 
 echo "delay message cnt:$delayCnt, delay time=$delaySec s"
 
-if [[ $delaySec > $timeThreshold ]] || [[ $delayCnt > $cntThreshold ]];then
+if [ $delaySec -ge $timeThreshold ] || [ $delayCnt -ge $cntThreshold ];then
   alert "MessageDelay"
 fi
