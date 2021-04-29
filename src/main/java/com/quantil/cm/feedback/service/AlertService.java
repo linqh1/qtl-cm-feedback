@@ -52,7 +52,7 @@ public class AlertService {
                 d.setEndpoint(alertProperties.getEndpoint());
             }
             if (d.getTimestamp() <= 0) {
-                d.setTimestamp(System.currentTimeMillis());
+                d.setTimestamp(System.currentTimeMillis()/1000);
             }
         }
         String json = JSON.toJSONString(data);

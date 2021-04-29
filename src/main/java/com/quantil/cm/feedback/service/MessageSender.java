@@ -28,7 +28,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -156,5 +158,27 @@ public class MessageSender implements MessageListenerConcurrently {
         Map<String, String> authHeader = EncryptUtil.quantilAuthHeader(ngapiUser, ngapiPassword);
         authHeader.forEach((k,v) -> httpPut.setHeader(k,v));
         return httpPut;
+    }
+    
+    public static void main(String[] main) throws Exception {
+        MessageSender ms = new MessageSender();
+        ms.clientProperties = new HttpClientProperties();
+        ms.clientProperties.setAddress("https://ngapi-qa.quantil.com/cdnapi/");
+        ms.clientProperties.setConnectTimeout(10000);
+        ms.clientProperties.setSocketTimeout(10000);
+        ms.ngapiUser = "cm_notification_qa";
+        ms.ngapiPassword = "";
+        ms.init();
+
+        PurgeMessage m1 = new PurgeMessage("111",100,100);
+        PurgeMessage m2 = new PurgeMessage("222",98,100);
+        m2.setVariedFiles(Arrays.asList("https://domain1/1.png","https://domain2/2.gif"));
+        List<PurgeMessage> messageList = Arrays.asList(m1,m2);
+        StringEntity entity = new StringEntity(JSON.toJSONString(messageList));
+        HttpPut httpPut = ms.buildHttpRequest("/internal/purges", entity);
+        CloseableHttpResponse response = ms.httpClient.execute(httpPut);
+        System.out.println(EntityUtils.toString(response.getEntity()));
+        EntityUtils.consumeQuietly(response.getEntity());
+        IOUtils.close(response);
     }
 }
