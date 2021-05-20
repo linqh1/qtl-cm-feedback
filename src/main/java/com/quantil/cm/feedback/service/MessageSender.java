@@ -86,8 +86,11 @@ public class MessageSender implements MessageListenerConcurrently {
                 responseList.add(response);
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode/100 != 2) {
-                    logger.error("feedback return non-2xx status code:{}. body: {}", statusCode,
-                            EntityUtils.toString(response.getEntity()));
+                    String headerLines = Arrays.asList(response.getAllHeaders()).stream()
+                            .map(header -> header.getName() + ":" + header.getValue())
+                            .collect(Collectors.joining("\n"));
+                    logger.error("feedback return non-2xx status code:{}", statusCode);
+                    logger.error("header:\n{}\n\n{}",headerLines,EntityUtils.toString(response.getEntity()));
                     alertService.alert("Param=SendFailed-" + statusCode);
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
