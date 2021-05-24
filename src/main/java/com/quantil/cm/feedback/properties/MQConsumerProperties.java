@@ -17,6 +17,8 @@ public class MQConsumerProperties {
 
     private int messageBatchSize;
 
+    private int reconsumeTimes;
+
     public String getGroup() {
         return group;
     }
@@ -51,6 +53,14 @@ public class MQConsumerProperties {
 
     public int getMessageBatchSize() {
         return messageBatchSize;
+    }
+
+    public int getReconsumeTimes() {
+        return reconsumeTimes;
+    }
+
+    public void setReconsumeTimes(int reconsumeTimes) {
+        this.reconsumeTimes = reconsumeTimes;
     }
 
     public void setMessageBatchSize(int messageBatchSize) {

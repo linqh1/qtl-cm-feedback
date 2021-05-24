@@ -34,6 +34,7 @@ public class MessageConsumer {
         logger.info("rocketmq config: {}", JSON.toJSONString(consumerProperties));
         pushConsumer = new DefaultMQPushConsumer(consumerProperties.getGroup());
         pushConsumer.setNamesrvAddr(consumerProperties.getNameserver());
+        pushConsumer.setMaxReconsumeTimes(consumerProperties.getReconsumeTimes());
         pushConsumer.subscribe(consumerProperties.getTopic(),"*");
         pushConsumer.setConsumeThreadMax(consumerProperties.getThreads());
         pushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
