@@ -77,6 +77,7 @@ public class MessageSender implements MessageListenerConcurrently {
         logger.info("consume {} message", msgs.size());
         List<HttpPut> requests = trans2Request(msgs);
         if (clientProperties.isDebug()) {
+            logger.info("[Debug Mode] consume success");
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         }
         List<CloseableHttpResponse> responseList = new ArrayList<>();
@@ -105,6 +106,7 @@ public class MessageSender implements MessageListenerConcurrently {
                 IOUtils.close(resp);
             });
         }
+        logger.info("consume success");
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     }
 
