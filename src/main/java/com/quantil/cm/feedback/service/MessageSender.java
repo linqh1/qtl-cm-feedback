@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 /**
@@ -175,15 +176,29 @@ public class MessageSender implements MessageListenerConcurrently {
         ms.ngapiPassword = "";
         ms.init();
 
-        PurgeMessage m1 = new PurgeMessage("111",100,100);
-        PurgeMessage m2 = new PurgeMessage("222",98,100);
-        m2.setVariedFiles(Arrays.asList("https://domain1/1.png","https://domain2/2.gif"));
-        List<PurgeMessage> messageList = Arrays.asList(m1,m2);
-        StringEntity entity = new StringEntity(JSON.toJSONString(messageList));
-        HttpPut httpPut = ms.buildHttpRequest("/internal/purges", entity);
-        CloseableHttpResponse response = ms.httpClient.execute(httpPut);
-        System.out.println(EntityUtils.toString(response.getEntity()));
-        EntityUtils.consumeQuietly(response.getEntity());
-        IOUtils.close(response);
+        CountDownLatch cd = new CountDownLatch(20);
+        for (int i=0;i<20;i++) {
+
+            new Thread(()->{
+                for (int j=0;j<1;j++) {
+                    try {
+                        PurgeMessage m1 = new PurgeMessage("111",100,100);
+                        PurgeMessage m2 = new PurgeMessage("222",98,100);
+                        m2.setVariedFiles(Arrays.asList("https://domain1/1.png","https://domain2/2.gif"));
+                        List<PurgeMessage> messageList = Arrays.asList(m1,m2);
+                        StringEntity entity = new StringEntity(JSON.toJSONString(messageList));
+                        HttpPut httpPut = ms.buildHttpRequest("/internal/purges", entity);
+                        CloseableHttpResponse response = ms.httpClient.execute(httpPut);
+                        System.out.println(EntityUtils.toString(response.getEntity()));
+                        EntityUtils.consumeQuietly(response.getEntity());
+                        IOUtils.close(response);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                cd.countDown();
+            }).start();;
+        }
+        cd.await();
     }
 }
